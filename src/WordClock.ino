@@ -1,10 +1,12 @@
 #include <FastLED.h>
 #include "ESP8266WiFi.h"
-#include "TimeClient.h"
+#include "NTPClient.h"
+#include <WiFiUdp.h>
 
-#define LED_PIN    2 //The data pin of the arduino
+#define FASTLED_ESP8266_D1_PIN_ORDER
+#define LED_PIN    D2 //The data pin of the arduino
 #define NUM_LEDS    110 //Numbers of LED
-#define BRIGHTNESS  20 //Brightness of the LEDs
+#define BRIGHTNESS  30 //Brightness of the LEDs
 #define LED_TYPE    WS2812 //The type of the LED stripe
 #define COLOR_ORDER GRB
 
@@ -13,15 +15,15 @@ CRGB leds[NUM_LEDS];
 #define UPDATES_PER_SECOND 120
 
 // WiFi parameters
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
+const char* ssid = "uhu-privat";
+const char* password = "privat-uhu";
 
 String hours, minutes, seconds;
 int currentSecond, currentMinute, currentHour;
 
-
-const float UTC_OFFSET = 1;
-TimeClient timeClient(UTC_OFFSET);
+WiFiUDP ntpUDP;
+const float UTC_OFFSET = 3600;
+NTPClient timeClient(ntpUDP, "ch.pool.ntp.org", UTC_OFFSET);
 
 void setup() {
   Serial.begin(115200);
@@ -37,8 +39,29 @@ void setup() {
 
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness(  BRIGHTNESS );
-  timeClient.updateTime();
+  timeClient.update();
+  Serial.println(timeClient.getFormattedTime());
+  runWhiteLed();
   fadeAll();
+}
+
+// This function runs over and over, and is where you do the magic to light
+// your leds.
+void runWhiteLed() {
+   // Move a single white led
+   for(int whiteLed = 0; whiteLed < NUM_LEDS; whiteLed = whiteLed + 1) {
+      // Turn our current led on to white, then show the leds
+      leds[whiteLed] = CRGB::White;
+
+      // Show the leds (only one of which is set to white, from above)
+      FastLED.show();
+
+      // Wait a little bit
+      delay(10);
+
+      // Turn our current led back to black for the next loop around
+      leds[whiteLed] = CRGB::Black;
+   }
 }
 
 void fadeAll() {
@@ -63,6 +86,7 @@ void wordES( int r, int g, int b) {
 }
 
 void wordIST(int r, int g, int b) {
+  showLed(103, r, g, b);
   showLed(104, r, g, b);
   showLed(105, r, g, b);
   showLed(106, r, g, b);
@@ -71,143 +95,138 @@ void wordFUENF(int r, int g, int b) {
   showLed(99, r, g, b);
   showLed(100, r, g, b);
   showLed(101, r, g, b);
-  showLed(102, r, g, b);
 }
 
 void wordZEHN(int r, int g, int b) {
-  showLed(88, r, g, b);
-  showLed(89, r, g, b);
-  showLed(90, r, g, b);
-  showLed(91, r, g, b);
+  showLed(96, r, g, b);
+  showLed(97, r, g, b);
+  showLed(98, r, g, b);
 }
 
 void wordZWANZIG(int r, int g, int b) {
-  showLed(98, r, g, b);
-  showLed(97, r, g, b);
-  showLed(96, r, g, b);
-  showLed(95, r, g, b);
-  showLed(94, r, g, b);
-  showLed(93, r, g, b);
-  showLed(92, r, g, b);
+  showLed(82, r, g, b);
+  showLed(83, r, g, b);
+  showLed(84, r, g, b);
+  showLed(85, r, g, b);
+  showLed(86, r, g, b);
+  showLed(87, r, g, b);
 }
 
 void wordDREI(int r, int g, int b) {
-  showLed(87, r, g, b);
-  showLed(86, r, g, b);
-  showLed(85, r, g, b);
-  showLed(84, r, g, b);
+  showLed(55, r, g, b);
+  showLed(56, r, g, b);
+  showLed(57, r, g, b);
 }
 
 
 void wordVIERTEL(int r, int g, int b) {
-  showLed(83, r, g, b);
-  showLed(82, r, g, b);
-  showLed(81, r, g, b);
-  showLed(80, r, g, b);
-  showLed(79, r, g, b);
-  showLed(78, r, g, b);
-  showLed(77, r, g, b);
+  showLed(88, r, g, b);
+  showLed(89, r, g, b);
+  showLed(90, r, g, b);
+  showLed(91, r, g, b);
+  showLed(92, r, g, b);
+  showLed(93, r, g, b);
 }
 
 void wordNACH(int r, int g, int b) {
-  showLed(68, r, g, b);
-  showLed(71, r, g, b);
-  showLed(70, r, g, b);
-  showLed(69, r, g, b);
+  showLed(66, r, g, b);
+  showLed(67, r, g, b);
 }
 void wordVOR(int r, int g, int b) {
-  showLed(74, r, g, b);
-  showLed(73, r, g, b);
-  showLed(72, r, g, b);
+  showLed(77, r, g, b);
+  showLed(78, r, g, b);
+  showLed(79, r, g, b);
 }
 void wordZWOELF(int r, int g, int b) {
-  showLed(60, r, g, b);
-  showLed(59, r, g, b);
-  showLed(58, r, g, b);
-  showLed(57, r, g, b);
-  showLed(56, r, g, b);
+  showLed(0, r, g, b);
+  showLed(1, r, g, b);
+  showLed(2, r, g, b);
+  showLed(3, r, g, b);
+  showLed(4, r, g, b);
+  showLed(5, r, g, b);
 }
 void wordHALB(int r, int g, int b) {
-  showLed(65, r, g, b);
-  showLed(64, r, g, b);
-  showLed(63, r, g, b);
-  showLed(62, r, g, b);
+  showLed(69, r, g, b);
+  showLed(70, r, g, b);
+  showLed(71, r, g, b);
+  showLed(72, r, g, b);
+  showLed(73, r, g, b);
 }
 
 void wordZWEI(int r, int g, int b) {
+  showLed(59, r, g, b);
+  showLed(60, r, g, b);
+  showLed(61, r, g, b);
+  showLed(62, r, g, b);
+}
+
+void wordEINS(int r, int g, int b) {
+  showLed(63, r, g, b);
+  showLed(64, r, g, b);
+  showLed(65, r, g, b);
+}
+void wordSIEBEN(int r, int g, int b) {
+  showLed(33, r, g, b);
+  showLed(34, r, g, b);
+  showLed(35, r, g, b);
+  showLed(36, r, g, b);
+  showLed(37, r, g, b);
+}
+
+void wordSTUNDEDREI(int r, int g, int b) {
+  showLed(55, r, g, b);
+  showLed(56, r, g, b);
+  showLed(57, r, g, b);
+}
+
+void wordSTUNDEFUENF(int r, int g, int b) {
+  showLed(49, r, g, b);
+  showLed(50, r, g, b);
+  showLed(51, r, g, b);
+  showLed(52, r, g, b);
+  showLed(53, r, g, b);
+}
+
+void wordVIER(int r, int g, int b) {
   showLed(44, r, g, b);
   showLed(45, r, g, b);
   showLed(46, r, g, b);
   showLed(47, r, g, b);
 }
 
-void wordEINS(int r, int g, int b) {
-  showLed(46, r, g, b);
-  showLed(47, r, g, b);
-  showLed(48, r, g, b);
-  showLed(49, r, g, b);
-}
-void wordSIEBEN(int r, int g, int b) {
-  showLed(49, r, g, b);
-  showLed(50, r, g, b);
-  showLed(51, r, g, b);
-  showLed(52, r, g, b);
-  showLed(53, r, g, b);
-  showLed(54, r, g, b);
-}
-
-void wordSTUNDEDREI(int r, int g, int b) {
-  showLed(42, r, g, b);
-  showLed(41, r, g, b);
-  showLed(40, r, g, b);
-  showLed(39, r, g, b);
-
-}
-
-void wordSTUNDEFUENF(int r, int g, int b) {
-  showLed(36, r, g, b);
-  showLed(35, r, g, b);
-  showLed(34, r, g, b);
-  showLed(33, r, g, b);
-}
-
-void wordVIER(int r, int g, int b) {
+void wordNEUN(int r, int g, int b) {
+  showLed(27, r, g, b);
+  showLed(28, r, g, b);
   showLed(29, r, g, b);
   showLed(30, r, g, b);
-  showLed(31, r, g, b);
-  showLed(32, r, g, b);
-}
-
-void wordNEUN(int r, int g, int b) {
-  showLed(28, r, g, b);
-  showLed(27, r, g, b);
-  showLed(26, r, g, b);
-  showLed(25, r, g, b);
 }
 void wordELF(int r, int g, int b) {
-  showLed(24, r, g, b);
-  showLed(23, r, g, b);
-  showLed(22, r, g, b);
+  showLed(11, r, g, b);
+  showLed(12, r, g, b);
+  showLed(13, r, g, b);
+  showLed(14, r, g, b);
 }
 void wordACHT(int r, int g, int b) {
-  showLed(20, r, g, b);
-  showLed(19, r, g, b);
-  showLed(18, r, g, b);
-  showLed(17, r, g, b);
+  showLed(22, r, g, b);
+  showLed(23, r, g, b);
+  showLed(24, r, g, b);
+  showLed(25, r, g, b);
+  showLed(26, r, g, b);
 }
 void wordSTUNDEZEHN(int r, int g, int b) {
-  showLed(16, r, g, b);
-  showLed(15, r, g, b);
-  showLed(14, r, g, b);
-  showLed(13, r, g, b);
+  showLed(18, r, g, b);
+  showLed(19, r, g, b);
+  showLed(20, r, g, b);
+  showLed(21, r, g, b);
 }
 
 void wordSECHS(int r, int g, int b) {
-  showLed(1, r, g, b);
-  showLed(2, r, g, b);
-  showLed(3, r, g, b);
-  showLed(4, r, g, b);
-  showLed(5, r, g, b);
+  showLed(38, r, g, b);
+  showLed(39, r, g, b);
+  showLed(40, r, g, b);
+  showLed(41, r, g, b);
+  showLed(42, r, g, b);
+  showLed(43, r, g, b);
 }
 
 void wordUHR(int r, int g, int b) {
@@ -232,7 +251,6 @@ void loop() {
   currentSecond = seconds.toInt();
   wordES(color(), color(), color());
   wordIST(color(), color(), color());
-  wordUHR(color(), color(), color());
 
   if (currentMinute >= 2 && currentMinute < 7) {
     wordFUENF(color(), color(), color());
@@ -272,9 +290,8 @@ void loop() {
     currentHour += 1;
   }
   if (currentMinute >= 42 && currentMinute < 47) {
-    wordDREI(color(), color(), color());
     wordVIERTEL(color(), color(), color());
-    wordNACH(color(), color(), color());
+    wordVOR(color(), color(), color());
   }
   if (currentMinute >= 47 && currentMinute < 52) {
     wordZEHN(color(), color(), color());
@@ -337,21 +354,3 @@ void loop() {
   delay(60000);
   fadeAll();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
