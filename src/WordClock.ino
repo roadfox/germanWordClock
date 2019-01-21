@@ -6,7 +6,7 @@
 #define FASTLED_ESP8266_D1_PIN_ORDER
 #define LED_PIN    D2 //The data pin of the arduino
 #define NUM_LEDS    110 //Numbers of LED
-#define BRIGHTNESS  30 //Brightness of the LEDs
+#define BRIGHTNESS  25 //Brightness of the LEDs
 #define LED_TYPE    WS2812 //The type of the LED stripe
 #define COLOR_ORDER GRB
 
@@ -37,7 +37,8 @@ void setup() {
   Serial.println("");
   Serial.println("WiFi connected");
 
-  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  //FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
   FastLED.setBrightness(  BRIGHTNESS );
   timeClient.update();
   Serial.println(timeClient.getFormattedTime());
@@ -45,20 +46,16 @@ void setup() {
   fadeAll();
 }
 
-// This function runs over and over, and is where you do the magic to light
-// your leds.
+// led test, moves a white led trough the whole strip
 void runWhiteLed() {
    // Move a single white led
    for(int whiteLed = 0; whiteLed < NUM_LEDS; whiteLed = whiteLed + 1) {
       // Turn our current led on to white, then show the leds
       leds[whiteLed] = CRGB::White;
-
       // Show the leds (only one of which is set to white, from above)
       FastLED.show();
-
       // Wait a little bit
       delay(10);
-
       // Turn our current led back to black for the next loop around
       leds[whiteLed] = CRGB::Black;
    }
@@ -112,13 +109,6 @@ void wordZWANZIG(int r, int g, int b) {
   showLed(87, r, g, b);
 }
 
-void wordDREI(int r, int g, int b) {
-  showLed(55, r, g, b);
-  showLed(56, r, g, b);
-  showLed(57, r, g, b);
-}
-
-
 void wordVIERTEL(int r, int g, int b) {
   showLed(88, r, g, b);
   showLed(89, r, g, b);
@@ -132,11 +122,13 @@ void wordNACH(int r, int g, int b) {
   showLed(66, r, g, b);
   showLed(67, r, g, b);
 }
+
 void wordVOR(int r, int g, int b) {
   showLed(77, r, g, b);
   showLed(78, r, g, b);
   showLed(79, r, g, b);
 }
+
 void wordZWOELF(int r, int g, int b) {
   showLed(0, r, g, b);
   showLed(1, r, g, b);
@@ -145,12 +137,19 @@ void wordZWOELF(int r, int g, int b) {
   showLed(4, r, g, b);
   showLed(5, r, g, b);
 }
+
 void wordHALB(int r, int g, int b) {
   showLed(69, r, g, b);
   showLed(70, r, g, b);
   showLed(71, r, g, b);
   showLed(72, r, g, b);
   showLed(73, r, g, b);
+}
+
+void wordEINS(int r, int g, int b) {
+  showLed(63, r, g, b);
+  showLed(64, r, g, b);
+  showLed(65, r, g, b);
 }
 
 void wordZWEI(int r, int g, int b) {
@@ -160,11 +159,12 @@ void wordZWEI(int r, int g, int b) {
   showLed(62, r, g, b);
 }
 
-void wordEINS(int r, int g, int b) {
-  showLed(63, r, g, b);
-  showLed(64, r, g, b);
-  showLed(65, r, g, b);
+void wordDREI(int r, int g, int b) {
+  showLed(55, r, g, b);
+  showLed(56, r, g, b);
+  showLed(57, r, g, b);
 }
+
 void wordSIEBEN(int r, int g, int b) {
   showLed(33, r, g, b);
   showLed(34, r, g, b);
@@ -184,7 +184,6 @@ void wordSTUNDEFUENF(int r, int g, int b) {
   showLed(50, r, g, b);
   showLed(51, r, g, b);
   showLed(52, r, g, b);
-  showLed(53, r, g, b);
 }
 
 void wordVIER(int r, int g, int b) {
@@ -192,6 +191,7 @@ void wordVIER(int r, int g, int b) {
   showLed(45, r, g, b);
   showLed(46, r, g, b);
   showLed(47, r, g, b);
+  showLed(48, r, g, b);
 }
 
 void wordNEUN(int r, int g, int b) {
@@ -239,6 +239,8 @@ int color() {
   return random(0, 255);
 }
 
+
+// Main loop
 void loop() {
 
   hours = timeClient.getHours();
@@ -292,6 +294,7 @@ void loop() {
   if (currentMinute >= 42 && currentMinute < 47) {
     wordVIERTEL(color(), color(), color());
     wordVOR(color(), color(), color());
+    currentHour += 1;
   }
   if (currentMinute >= 47 && currentMinute < 52) {
     wordZEHN(color(), color(), color());
@@ -306,6 +309,7 @@ void loop() {
   if (currentMinute >= 57 && currentMinute <= 59 ) {
     currentHour += 1;
   }
+  if (currentHour > 12) currentHour = currentHour - 12;
 
   switch (currentHour) {
     case 1:
