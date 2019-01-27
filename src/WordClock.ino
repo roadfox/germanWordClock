@@ -6,7 +6,8 @@
 #define FASTLED_ESP8266_D1_PIN_ORDER
 #define LED_PIN    D2 //The data pin of the arduino
 #define NUM_LEDS    110 //Numbers of LED
-#define BRIGHTNESS  25 //Brightness of the LEDs
+#define BRIGHTNESS  140 //Brightness of the LEDs
+#define NIGHT_REDUCE 40 //Amount to reduce the brightness during night hours
 #define LED_TYPE    WS2812 //The type of the LED stripe
 #define COLOR_ORDER GRB
 
@@ -39,8 +40,9 @@ void setup() {
 
   //FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
-  FastLED.setBrightness(  BRIGHTNESS );
+  FastLED.setBrightness( BRIGHTNESS );
   timeClient.update();
+  Serial.println("Current Time from NTP Server:");
   Serial.println(timeClient.getFormattedTime());
   runWhiteLed();
   fadeAll();
@@ -71,168 +73,170 @@ void fadeAll() {
   FastLED.show();
 }
 
-void showLed(int i, int r, int g, int b) {
-  leds[i].r = r;
-  leds[i].g = g;
-  leds[i].b = b;
+void showLed(int i, int h, int s) {
+  int v = BRIGHTNESS;
+  if ( timeClient.getHours() > 20 || timeClient.getHours() < 6 ) {
+    v = v - NIGHT_REDUCE;
+  }
+  leds[i] = CHSV( h, s, v );
 }
 
-void wordES( int r, int g, int b) {
-  showLed(108, r, g, b);
-  showLed(109, r, g, b);
+void wordES( int h, int s) {
+  showLed(108, h, s);
+  showLed(109, h, s);
 }
 
-void wordIST(int r, int g, int b) {
-  showLed(103, r, g, b);
-  showLed(104, r, g, b);
-  showLed(105, r, g, b);
-  showLed(106, r, g, b);
+void wordIST(int h, int s) {
+  showLed(103, h, s);
+  showLed(104, h, s);
+  showLed(105, h, s);
+  showLed(106, h, s);
 }
-void wordFUENF(int r, int g, int b) {
-  showLed(99, r, g, b);
-  showLed(100, r, g, b);
-  showLed(101, r, g, b);
-}
-
-void wordZEHN(int r, int g, int b) {
-  showLed(96, r, g, b);
-  showLed(97, r, g, b);
-  showLed(98, r, g, b);
+void wordFUENF(int h, int s) {
+  showLed(99, h, s);
+  showLed(100, h, s);
+  showLed(101, h, s);
 }
 
-void wordZWANZIG(int r, int g, int b) {
-  showLed(82, r, g, b);
-  showLed(83, r, g, b);
-  showLed(84, r, g, b);
-  showLed(85, r, g, b);
-  showLed(86, r, g, b);
-  showLed(87, r, g, b);
+void wordZEHN(int h, int s) {
+  showLed(96, h, s);
+  showLed(97, h, s);
+  showLed(98, h, s);
 }
 
-void wordVIERTEL(int r, int g, int b) {
-  showLed(88, r, g, b);
-  showLed(89, r, g, b);
-  showLed(90, r, g, b);
-  showLed(91, r, g, b);
-  showLed(92, r, g, b);
-  showLed(93, r, g, b);
+void wordZWANZIG(int h, int s) {
+  showLed(82, h, s);
+  showLed(83, h, s);
+  showLed(84, h, s);
+  showLed(85, h, s);
+  showLed(86, h, s);
+  showLed(87, h, s);
 }
 
-void wordNACH(int r, int g, int b) {
-  showLed(66, r, g, b);
-  showLed(67, r, g, b);
+void wordVIERTEL(int h, int s) {
+  showLed(88, h, s);
+  showLed(89, h, s);
+  showLed(90, h, s);
+  showLed(91, h, s);
+  showLed(92, h, s);
+  showLed(93, h, s);
 }
 
-void wordVOR(int r, int g, int b) {
-  showLed(77, r, g, b);
-  showLed(78, r, g, b);
-  showLed(79, r, g, b);
+void wordNACH(int h, int s) {
+  showLed(66, h, s);
+  showLed(67, h, s);
 }
 
-void wordZWOELF(int r, int g, int b) {
-  showLed(0, r, g, b);
-  showLed(1, r, g, b);
-  showLed(2, r, g, b);
-  showLed(3, r, g, b);
-  showLed(4, r, g, b);
-  showLed(5, r, g, b);
+void wordVOR(int h, int s) {
+  showLed(77, h, s);
+  showLed(78, h, s);
+  showLed(79, h, s);
 }
 
-void wordHALB(int r, int g, int b) {
-  showLed(69, r, g, b);
-  showLed(70, r, g, b);
-  showLed(71, r, g, b);
-  showLed(72, r, g, b);
-  showLed(73, r, g, b);
+void wordZWOELF(int h, int s) {
+  showLed(0, h, s);
+  showLed(1, h, s);
+  showLed(2, h, s);
+  showLed(3, h, s);
+  showLed(4, h, s);
+  showLed(5, h, s);
 }
 
-void wordEINS(int r, int g, int b) {
-  showLed(63, r, g, b);
-  showLed(64, r, g, b);
-  showLed(65, r, g, b);
+void wordHALB(int h, int s) {
+  showLed(69, h, s);
+  showLed(70, h, s);
+  showLed(71, h, s);
+  showLed(72, h, s);
+  showLed(73, h, s);
 }
 
-void wordZWEI(int r, int g, int b) {
-  showLed(59, r, g, b);
-  showLed(60, r, g, b);
-  showLed(61, r, g, b);
-  showLed(62, r, g, b);
+void wordEINS(int h, int s) {
+  showLed(63, h, s);
+  showLed(64, h, s);
+  showLed(65, h, s);
 }
 
-void wordDREI(int r, int g, int b) {
-  showLed(55, r, g, b);
-  showLed(56, r, g, b);
-  showLed(57, r, g, b);
+void wordZWEI(int h, int s) {
+  showLed(59, h, s);
+  showLed(60, h, s);
+  showLed(61, h, s);
+  showLed(62, h, s);
 }
 
-void wordSIEBEN(int r, int g, int b) {
-  showLed(33, r, g, b);
-  showLed(34, r, g, b);
-  showLed(35, r, g, b);
-  showLed(36, r, g, b);
-  showLed(37, r, g, b);
+void wordDREI(int h, int s) {
+  showLed(55, h, s);
+  showLed(56, h, s);
+  showLed(57, h, s);
 }
 
-void wordSTUNDEDREI(int r, int g, int b) {
-  showLed(55, r, g, b);
-  showLed(56, r, g, b);
-  showLed(57, r, g, b);
+void wordSIEBEN(int h, int s) {
+  showLed(33, h, s);
+  showLed(34, h, s);
+  showLed(35, h, s);
+  showLed(36, h, s);
+  showLed(37, h, s);
 }
 
-void wordSTUNDEFUENF(int r, int g, int b) {
-  showLed(49, r, g, b);
-  showLed(50, r, g, b);
-  showLed(51, r, g, b);
-  showLed(52, r, g, b);
+void wordSTUNDEDREI(int h, int s) {
+  showLed(55, h, s);
+  showLed(56, h, s);
+  showLed(57, h, s);
 }
 
-void wordVIER(int r, int g, int b) {
-  showLed(44, r, g, b);
-  showLed(45, r, g, b);
-  showLed(46, r, g, b);
-  showLed(47, r, g, b);
-  showLed(48, r, g, b);
+void wordSTUNDEFUENF(int h, int s) {
+  showLed(49, h, s);
+  showLed(50, h, s);
+  showLed(51, h, s);
+  showLed(52, h, s);
 }
 
-void wordNEUN(int r, int g, int b) {
-  showLed(27, r, g, b);
-  showLed(28, r, g, b);
-  showLed(29, r, g, b);
-  showLed(30, r, g, b);
-}
-void wordELF(int r, int g, int b) {
-  showLed(11, r, g, b);
-  showLed(12, r, g, b);
-  showLed(13, r, g, b);
-  showLed(14, r, g, b);
-}
-void wordACHT(int r, int g, int b) {
-  showLed(22, r, g, b);
-  showLed(23, r, g, b);
-  showLed(24, r, g, b);
-  showLed(25, r, g, b);
-  showLed(26, r, g, b);
-}
-void wordSTUNDEZEHN(int r, int g, int b) {
-  showLed(18, r, g, b);
-  showLed(19, r, g, b);
-  showLed(20, r, g, b);
-  showLed(21, r, g, b);
+void wordVIER(int h, int s) {
+  showLed(44, h, s);
+  showLed(45, h, s);
+  showLed(46, h, s);
+  showLed(47, h, s);
+  showLed(48, h, s);
 }
 
-void wordSECHS(int r, int g, int b) {
-  showLed(38, r, g, b);
-  showLed(39, r, g, b);
-  showLed(40, r, g, b);
-  showLed(41, r, g, b);
-  showLed(42, r, g, b);
-  showLed(43, r, g, b);
+void wordNEUN(int h, int s) {
+  showLed(27, h, s);
+  showLed(28, h, s);
+  showLed(29, h, s);
+  showLed(30, h, s);
+}
+void wordELF(int h, int s) {
+  showLed(11, h, s);
+  showLed(12, h, s);
+  showLed(13, h, s);
+  showLed(14, h, s);
+}
+void wordACHT(int h, int s) {
+  showLed(22, h, s);
+  showLed(23, h, s);
+  showLed(24, h, s);
+  showLed(25, h, s);
+  showLed(26, h, s);
+}
+void wordSTUNDEZEHN(int h, int s) {
+  showLed(18, h, s);
+  showLed(19, h, s);
+  showLed(20, h, s);
+  showLed(21, h, s);
 }
 
-void wordUHR(int r, int g, int b) {
-  showLed(10, r, g, b);
-  showLed(9, r, g, b);
-  showLed(8, r, g, b);
+void wordSECHS(int h, int s) {
+  showLed(38, h, s);
+  showLed(39, h, s);
+  showLed(40, h, s);
+  showLed(41, h, s);
+  showLed(42, h, s);
+  showLed(43, h, s);
+}
+
+void wordUHR(int h, int s) {
+  showLed(10, h, s);
+  showLed(9, h, s);
+  showLed(8, h, s);
 }
 
 int color() {
@@ -251,59 +255,59 @@ void loop() {
   if (currentHour > 12) currentHour = currentHour - 12;
   currentMinute = minutes.toInt();
   currentSecond = seconds.toInt();
-  wordES(color(), color(), color());
-  wordIST(color(), color(), color());
+  wordES(color(), color());
+  wordIST(color(), color());
 
   if (currentMinute >= 2 && currentMinute < 7) {
-    wordFUENF(color(), color(), color());
-    wordNACH(color(), color(), color());
+    wordFUENF(color(), color());
+    wordNACH(color(), color());
   }
   if (currentMinute >= 7 && currentMinute < 12) {
-    wordZEHN(color(), color(), color());
-    wordNACH(color(), color(), color());
+    wordZEHN(color(), color());
+    wordNACH(color(), color());
   }
   if (currentMinute >= 12 && currentMinute < 17) {
-    wordVIERTEL(color(), color(), color());
-    wordNACH(color(), color(), color());
+    wordVIERTEL(color(), color());
+    wordNACH(color(), color());
   }
   if (currentMinute >= 17 && currentMinute < 22) {
-    wordZWANZIG(color(), color(), color());
-    wordNACH(color(), color(), color());
+    wordZWANZIG(color(), color());
+    wordNACH(color(), color());
   }
   if (currentMinute >= 22 && currentMinute < 27) {
-    wordFUENF(color(), color(), color());
-    wordVOR(color(), color(), color());
-    wordHALB(color(), color(), color());
+    wordFUENF(color(), color());
+    wordVOR(color(), color());
+    wordHALB(color(), color());
     currentHour += 1;
   }
   if (currentMinute >= 27 && currentMinute < 32) {
-    wordHALB(color(), color(), color());
+    wordHALB(color(), color());
     currentHour += 1;
   }
   if (currentMinute >= 32 && currentMinute < 37) {
-    wordFUENF(color(), color(), color());
-    wordNACH(color(), color(), color());
-    wordHALB(color(), color(), color());
+    wordFUENF(color(), color());
+    wordNACH(color(), color());
+    wordHALB(color(), color());
     currentHour += 1;
   }
   if (currentMinute >= 37 && currentMinute < 42) {
-    wordZWANZIG(color(), color(), color());
-    wordVOR(color(), color(), color());
+    wordZWANZIG(color(), color());
+    wordVOR(color(), color());
     currentHour += 1;
   }
   if (currentMinute >= 42 && currentMinute < 47) {
-    wordVIERTEL(color(), color(), color());
-    wordVOR(color(), color(), color());
+    wordVIERTEL(color(), color());
+    wordVOR(color(), color());
     currentHour += 1;
   }
   if (currentMinute >= 47 && currentMinute < 52) {
-    wordZEHN(color(), color(), color());
-    wordVOR(color(), color(), color());
+    wordZEHN(color(), color());
+    wordVOR(color(), color());
     currentHour += 1;
   }
   if (currentMinute >= 52 && currentMinute < 57) {
-    wordZEHN(color(), color(), color());
-    wordVOR(color(), color(), color());
+    wordZEHN(color(), color());
+    wordVOR(color(), color());
     currentHour += 1;
   }
   if (currentMinute >= 57 && currentMinute <= 59 ) {
@@ -313,43 +317,43 @@ void loop() {
 
   switch (currentHour) {
     case 1:
-      wordEINS(color(), color(), color());
+      wordEINS(color(), color());
       break;
     case 2:
-      wordZWEI(color(), color(), color());
+      wordZWEI(color(), color());
       break;
     case 3:
-      wordSTUNDEDREI(color(), color(), color());
+      wordSTUNDEDREI(color(), color());
       break;
     case 4:
-      wordVIER(color(), color(), color());
+      wordVIER(color(), color());
       break;
     case 5:
-      wordSTUNDEFUENF(color(), color(), color());
+      wordSTUNDEFUENF(color(), color());
       break;
     case 6:
-      wordSECHS(color(), color(), color());
+      wordSECHS(color(), color());
       break;
     case 7:
-      wordSIEBEN(color(), color(), color());
+      wordSIEBEN(color(), color());
       break;
     case 8:
-      wordACHT(color(), color(), color());
+      wordACHT(color(), color());
       break;
     case 9:
-      wordNEUN(color(), color(), color());
+      wordNEUN(color(), color());
       break;
     case 10:
-      wordSTUNDEZEHN(color(), color(), color());
+      wordSTUNDEZEHN(color(), color());
       break;
     case 11:
-      wordELF(color(), color(), color());
+      wordELF(color(), color());
       break;
     case 12:
-      wordZWOELF(color(), color(), color());
+      wordZWOELF(color(), color());
       break;
     case 0:
-      wordZWOELF(color(), color(), color());
+      wordZWOELF(color(), color());
       break;
   }
 
