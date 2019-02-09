@@ -1,5 +1,6 @@
 #include <FastLED.h>
 #include "ESP8266WiFi.h"
+#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
 #include "NTPClient.h"
 #include <WiFiUdp.h>
 
@@ -14,16 +15,17 @@
 #define LDR_SHIFT -500 //amount to shift the LDR value
 #define LDR_FACTOR 0.1 //amount to multiply the LDR value
 // formula:
-// BRIGTNESS = BRIGHTNESS + ((LDR value + LDR_SHIFT) * LDR_FACTOR)
+// BRIGHTNESS = BRIGHTNESS + ((LDR value + LDR_SHIFT) * LDR_FACTOR)
 
 CRGB leds[NUM_LEDS];
 
 #define UPDATES_PER_SECOND 120
 
 // WiFi parameters
-const char* ssid = "uhu-privat";
-const char* password = "privat-uhu";
+//const char* ssid = "uhu-privat";
+//const char* password = "privat-uhu";
 
+// Time parameters
 String hours, minutes, seconds;
 int currentSecond, currentMinute, currentHour;
 
@@ -34,13 +36,10 @@ NTPClient timeClient(ntpUDP, "ch.pool.ntp.org", UTC_OFFSET);
 void setup() {
   Serial.begin(115200);
 
-  // Connect to WiFi
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
+  // Init WiFi
+  WiFiManager wifiManager;            // init wifi manager
+  wifiManager.resetSettings();            //mit diesem befehl kannst die gespeicherten werte löschen
+  wifiManager.autoConnect("Word Clock");
   Serial.println("WiFi connected");
 
   //FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
