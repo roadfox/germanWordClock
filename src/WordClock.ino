@@ -30,6 +30,7 @@ String hours, minutes, seconds;
 int currentSecond, currentMinute, currentHour;
 
 WiFiUDP ntpUDP;
+// - Timezone. - //
 const float UTC_OFFSET = 3600;
 NTPClient timeClient(ntpUDP, "ch.pool.ntp.org", UTC_OFFSET);
 
@@ -38,7 +39,7 @@ void setup() {
 
   // Init WiFi
   WiFiManager wifiManager;            // init wifi manager
-  wifiManager.resetSettings();            //mit diesem befehl kannst die gespeicherten werte löschen
+  //wifiManager.resetSettings();            //mit diesem befehl kannst die gespeicherten werte löschen
   wifiManager.autoConnect("Word Clock");
   Serial.println("WiFi connected");
 
