@@ -2,7 +2,7 @@
 ##  Swiss Layout adaption
 
 
-- Based in mirohero's version https://github.com/mirohero/germanWordClock
+- Based on mirohero's version https://github.com/mirohero/germanWordClock
 - ported to PlatformIO IDE https://platformio.org/
 
 I also changed the case slightly
@@ -26,7 +26,7 @@ If you don't have an LDR you can also connect a potentiometer instead
 
 1. Change the Env settings in platformio.ini to your board specs
 2. Build and Upload the code in PlatformIO to your board
-3. User your mobile phone to scan for an AP called "Word Clock"
+3. User your mobile phone to scan for an WiFi called "Word Clock"
 4. Connect to this AP and configure your WiFi settings
 
 
