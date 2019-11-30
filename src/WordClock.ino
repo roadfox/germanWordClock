@@ -26,12 +26,11 @@ String hours, minutes, seconds;
 int currentSecond, currentMinute, currentHour;
 
 // Set web server port number to 80
-WiFiServer server(80);
-// Variable to store the HTTP request
-String header;
+ESP8266WebServer server(80); //https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer
 
 #include "led.h"
 #include "clock.h"
+#include "web.h"
 
 
 void setup() {
@@ -54,21 +53,11 @@ void setup() {
   FastLED.setBrightness( BRIGHTNESS );
   runWhiteLed();
   fadeAll();
-}
 
-void get_time(){
-  time_t now;
-  time(&now);
-  char hours_output[30], minutes_output[30], seconds_output[30];
-  // See http://www.cplusplus.com/reference/ctime/strftime/ for strftime functions
-  //strftime(time_output, 30, "%T", localtime(&now)); // Formats time as: 14:05:49
-  strftime(hours_output, 30, "%H", localtime(&now));
-  strftime(minutes_output, 30, "%M", localtime(&now));
-  strftime(seconds_output, 30, "%S", localtime(&now));
-
-  hours = hours_output;
-  minutes = minutes_output;
-  seconds = seconds_output;
+  // Init Webserver
+  server.on("/", handle_index); //Handle Index page
+  server.on("/all", HTTP_GET, get_all);  
+  server.begin();
 }
 
 
@@ -91,6 +80,6 @@ void loop() {
     FastLED.show();
   }
 
-  delay(10000);
+  server.handleClient(); //Handling of incoming client requests
 
 }

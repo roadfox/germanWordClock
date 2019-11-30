@@ -1,3 +1,19 @@
+// tome and wordclock related functions
+
+void get_time(){
+  time_t now;
+  time(&now);
+  char hours_output[30], minutes_output[30], seconds_output[30];
+  // See http://www.cplusplus.com/reference/ctime/strftime/ for strftime functions
+  //strftime(time_output, 30, "%T", localtime(&now)); // Formats time as: 14:05:49
+  strftime(hours_output, 30, "%H", localtime(&now));
+  strftime(minutes_output, 30, "%M", localtime(&now));
+  strftime(seconds_output, 30, "%S", localtime(&now));
+
+  hours = hours_output;
+  minutes = minutes_output;
+  seconds = seconds_output;
+}
 
 void wordES( int h, int s, int v) {
   showLed(108, h, s, v);
