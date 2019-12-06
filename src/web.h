@@ -1,6 +1,33 @@
+#include <Arduino.h>
+
 void handle_index() {
-  //Print Hello at opening homepage
-  server.send(200, "text/plain", "Time:  " + String(hours) + ":" + String(minutes) + ":" + String(seconds));
+  // send index page
+  String index_page = "<html>\
+    <head>\
+      <title>ESP8266 Web Server POST handling</title>\
+      <style>\
+        body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
+      </style>\
+    </head>\
+    <body>\
+      Time: " + String(hours) + ":" + String(minutes) + ":" + String(seconds) + "<br>\
+      <h3>Set Brightness value</h3>\
+      <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/brightness/\">\
+        <input type=\"text\" name=\"brightness\" value=\"" + brightness + "\"> \
+        <input type=\"submit\" value=\"Submit\">\
+      </form>\
+    </body>\
+  </html>";
+
+  server.send(200, "text/html", index_page);
+}
+
+void post_brightness() {
+  //server.send(200, "text/plain", "Brightness set to: " + server.arg("brightness") + "\n");
+  server.sendHeader("Location","/");        // Add a header to respond with a new location for the browser to go to the home page again
+  server.send(303);                         // Send it back to the browser with an HTTP status 303 (See Other) to redirect
+  brightness = server.arg("brightness").toInt();
+  refresh = true;
 }
 
 void get_all() {

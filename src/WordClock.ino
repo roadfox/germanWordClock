@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#define FASTLED_INTERNAL
 #include <FastLED.h>
 #include "ESP8266WiFi.h"          // or #include <WiFi.h> for ESP32
 #include <WiFiManager.h>          // https://github.com/tzapu/WiFiManager WiFi Configuration Magic
@@ -15,15 +17,17 @@ CRGB leds[NUM_LEDS];
 // LDR Params
 
 #define LDR_PIN A0         // what pin is the LDR output connected to
-#define BRIGHTNESS  140    // Base Brightness of the LEDs
 #define LDR_SHIFT -500     // amount to shift the LDR value
 #define LDR_FACTOR 0.1     // amount to multiply the LDR value
-  // formula:
-  // BRIGHTNESS = BRIGHTNESS + ((LDR value + LDR_SHIFT) * LDR_FACTOR)
+
+int brightness = 181; // Base Brightness of the LEDs
+// formula:
+// brightness = brightness + ((LDR value + LDR_SHIFT) * LDR_FACTOR)
 
 // Time parameters
 String hours, minutes, seconds;
 int currentSecond, currentMinute, currentHour;
+bool refresh = false;
 
 // Set web server port number to 80
 ESP8266WebServer server(80); //https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer
@@ -32,13 +36,13 @@ ESP8266WebServer server(80); //https://github.com/esp8266/Arduino/tree/master/li
 #include "clock.h"
 #include "web.h"
 
-
 void setup() {
   Serial.begin(115200);
 
   // Init WiFi
   WiFiManager wifiManager;            // init wifi manager
   //wifiManager.resetSettings();            //mit diesem befehl kannst die gespeicherten werte löschen
+  WiFi.hostname("wordclock");
   wifiManager.autoConnect("Word Clock");
   Serial.println("WiFi connected");
 
@@ -50,13 +54,14 @@ void setup() {
 
   //FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
-  FastLED.setBrightness( BRIGHTNESS );
+  FastLED.setBrightness( brightness );
   runWhiteLed();
   fadeAll();
 
   // Init Webserver
   server.on("/", handle_index); //Handle Index page
-  server.on("/all", HTTP_GET, get_all);  
+  server.on("/all", HTTP_GET, get_all);
+  server.on("/brightness/", HTTP_POST, post_brightness);
   server.begin();
 }
 
@@ -69,12 +74,14 @@ void loop() {
   get_time(); // get actual Time
 
   // if minute changed call word display
-  if (minutes.toInt() != currentMinute) {
+  if (minutes.toInt() != currentMinute or refresh) {
+    refresh = false; // reset refresh
     // calculate brightness value
-    int v = BRIGHTNESS + ((analogRead(LDR_PIN)+LDR_SHIFT)*LDR_FACTOR);
+    int v = brightness + ((analogRead(LDR_PIN)+LDR_SHIFT)*LDR_FACTOR);
     Serial.print("Calculated Brightness: ");
     Serial.println(v);
     Serial.println("Time: " + hours + ":" + minutes + ":" + seconds);
+    // update the clock
     fadeAll();
     showWords(v);
     FastLED.show();
